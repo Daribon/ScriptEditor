@@ -88,15 +88,27 @@ namespace ScriptEditor
 
         private static void LoadConfig()
         {
-            if (!System.IO.File.Exists(@"config.ini"))
+            string configPath = @"config.ini";
+
+            if (!System.IO.File.Exists(configPath))
             {
-                MessageBox.Show("Your config file seems to have vanished into the nether! But worry not, i shall use my ultra-safe mind reading device to guess your database connection details. Surely nothing can go wrong, gnomish inventions are renowned for their safety after all!", "No config found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                return;
+                MessageBox.Show("Your config file seems to have vanished into the nether! But worry not, I shall use my ultra-safe mind reading device to guess your database connection details. Surely nothing can go wrong, gnomish inventions are renowned for their safety after all!", "No config found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                // If config not found, create config with default values
+                using (System.IO.StreamWriter writer = new System.IO.StreamWriter(configPath))
+                {
+                    writer.WriteLine("User=root");
+                    writer.WriteLine("Pass=root");
+                    writer.WriteLine("Host=localhost");
+                    writer.WriteLine("Port=3306");
+                    writer.WriteLine("DB=mangos");
+                    writer.WriteLine("Locale=en-US");
+                    writer.WriteLine("Highlight=false");
+                }
             }
 
             string line;
-            System.IO.StreamReader file = new System.IO.StreamReader(@"config.ini");
-            while ((line = file.ReadLine()) != null)
+            using (System.IO.StreamReader file = new System.IO.StreamReader(configPath))
+                while ((line = file.ReadLine()) != null)
             {
                 if (line.Contains("User="))
                     mysqlUser = line.Replace("User=", "");
